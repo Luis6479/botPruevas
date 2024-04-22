@@ -9,7 +9,6 @@ import telebot
 
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-port = process.env.PORT || 4000;
 turns = [1]
 turno = ""
 #------------------Menseje de bienvenida---------------------------------------------------------
