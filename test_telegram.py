@@ -14,11 +14,11 @@ turno = ""
 #------------------Menseje de bienvenida---------------------------------------------------------
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
-	markups = InlineKeyboardMarkup(row_width=2)
-	b_reserva = InlineKeyboardButton("Reservar", callback_data="reservar")
-	b_editar = InlineKeyboardButton("Editar", callback_data="editar")
+	markups = InlineKeyboardMarkup(row_width=1)
+	b_reserva = InlineKeyboardButton("Reservar turnos", callback_data="reservar")
+	b_editar = InlineKeyboardButton("Administrar turnos", callback_data="editar")
 	markups.add(b_reserva,b_editar)
-	bot.send_message(message.chat.id, "Hola", reply_markup=markups)
+	bot.send_message(message.chat.id, "Hola que operacion desea realisar", reply_markup=markups)
 	bot.delete_message(message.chat.id, message.message_id)
 
 #--------------------------Botones---------------------------------------------------------------- 
