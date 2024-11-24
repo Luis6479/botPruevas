@@ -1,3 +1,4 @@
+import time
 import archivo
 import botones
 from config import *
@@ -6,11 +7,22 @@ from telebot.types import InlineKeyboardMarkup
 from telebot.types import InlineKeyboardButton
 from botones import *
 import telebot
+from flask import Flask, request
+from pyngrok import ngrok, conf
+from waitress import serve
 
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 turns = [1]
 turno = ""
+
+web_server = Flask(__name__)
+@web_server.route('/', methods=["POST"])
+def webhook():
+	if request.headers.get("content-type") == "application/json":
+		update = telebot.types.Update.de_json(request.stream.read().decode('utf-8'))
+		bot.process_new_updates([update])
+		return "OK",200
 #------------------Menseje de bienvenida---------------------------------------------------------
 @bot.message_handler(commands=["start"])
 def cmd_start(message):
@@ -132,5 +144,14 @@ def respuesta_botones_inline(call):
 if __name__ == '__main__':
    bot.set_my_commands([telebot.types.BotCommand("/start", "Da la Biembenida"),telebot.types.BotCommand("/turnos", "Muestar los Turnos"),telebot.types.BotCommand("/nuevos", "Crear turnos"),])
    print('Bot iniciado')
-   bot.infinity_polling()
+   conf.get_default().config_path = "/config_ngrok.yml"
+   conf.get_default().region = "eu"
+   ngrok.set_auth_token(NGROK_TOKEN)
+   ngrok_tunel = ngrok.connect(5000, bind_tls=True)
+   ngrok_url = ngrok_tunel.public_url
+   print("URL NGROG:", ngrok_url)
+   bot.remove_webhook()
+   time.sleep(1)
+   bot.set_webhook(url=ngrok_url)
+   serve(web_server, host="0.0.0.0", port=5000)
    print('Bot finalicado')
